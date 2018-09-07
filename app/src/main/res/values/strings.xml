@@ -14,6 +14,7 @@
     <string name="signin">Sign In</string>
     <string name="not_member">Not A Member yet ?</string>
     <string name="signup">Sign Up Now!</string>
+    <string name="welcome">WELCOME</string>
 
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
