@@ -15,4 +15,10 @@
         <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
 
+    <style name="RegistrationStyle" parent="loginStyle">
+        <item name="android:windowBackground">@color/colorPrimary</item>
+
+
+    </style>
+
 </resources>

@@ -15,6 +15,18 @@
     <string name="not_member">Not A Member yet ?</string>
     <string name="signup">Sign Up Now!</string>
     <string name="welcome">WELCOME</string>
+    <string name="create_password">Create Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="gender">Gender</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="religion">Religion</string>
+    <string name="city">City</string>
+    <string name="state">State</string>
+    <string name="full_name">Full Name</string>
+    <string name="create_account">Create Account</string>
+    <string name="register_below">Register Below</string>
+
+
 
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
