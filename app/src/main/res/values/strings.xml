@@ -28,6 +28,17 @@
     <string name="your_full_name">Full Name</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
+    <string name="about_you">About You</string>
+    <string name="occupaion">Occupation</string>
+    <string name="enter">Enter</string>
+    <string name="about_yourself">About Yourself</string>
+    <string-array name="religion_list">
+        <item>None</item>
+        <item>Christian</item>
+        <item>Jewish</item>
+        <item>Muslim</item>
+        <item>Hindu</item>
+    </string-array>
     <string-array name="states">
         <item>AL</item>
         <item>AR</item>

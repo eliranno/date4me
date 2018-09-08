@@ -13,7 +13,8 @@
         app:cardBackgroundColor="@color/white"
         android:layout_marginRight="15dp"
         android:background="@color/white"
-        card_view:cardElevation="2dp">
+        card_view:cardElevation="2dp"
+        card_view:cardCornerRadius="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,6 +47,7 @@
 
 
             <EditText
+                android:id="@+id/ev_full_name"
                 android:layout_width="323dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
@@ -71,11 +73,13 @@
                 android:orientation="horizontal">
 
                 <RadioButton
+                    android:id="@+id/radio_male"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/male"/>
 
                 <RadioButton
+                    android:id="@+id/radio_female"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/female"/>
@@ -93,6 +97,7 @@
 
 
             <EditText
+                android:id="@+id/ev_date_of_birth"
                 android:layout_width="323dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
@@ -113,6 +118,7 @@
 
 
             <EditText
+                android:id="@+id/ev_city"
                 android:layout_width="323dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="10dp"
@@ -132,6 +138,7 @@
                 android:text="@string/state" />
 
             <Spinner
+                android:id="@+id/spinner_states"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:entries="@array/states"
