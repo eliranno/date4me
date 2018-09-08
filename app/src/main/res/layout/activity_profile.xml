@@ -35,9 +35,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp">
 
-                <include
-                    layout="@layout/basic_info_card"
-                    android:id="@+id/includedLayout"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <include
+                        layout="@layout/basic_info_card"
+                        android:id="@+id/basic_info_card_layout"/>
+
+                    <include
+                        layout="@layout/about_you_card"
+                        android:id="@+id/about_you_card"/>
+
+                </LinearLayout>
+
 
 
 
