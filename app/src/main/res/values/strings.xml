@@ -22,13 +22,13 @@
     <string name="religion">Religion</string>
     <string name="city">City</string>
     <string name="state">State</string>
-    <string name="full_name">Full Name</string>
+    <string name="full_name">Enter Full Name</string>
     <string name="create_account">Create Account</string>
     <string name="register_below">Register Below</string>
-
 
 
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="profile">User Profile</string>
 </resources>
