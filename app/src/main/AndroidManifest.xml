@@ -19,17 +19,19 @@
             android:theme="@style/loginStyle"></activity>
         <activity
             android:name=".RegistrationActivity"
-            android:theme="@style/RegistrationStyle">
-        </activity>
+            android:theme="@style/RegistrationStyle" />
         <activity
             android:name=".ProfileActivity"
             android:label="@string/profile"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ChatActivity"></activity>
     </application>
 
 </manifest>

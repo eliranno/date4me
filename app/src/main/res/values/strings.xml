@@ -32,6 +32,8 @@
     <string name="occupaion">Occupation</string>
     <string name="enter">Enter</string>
     <string name="about_yourself">About Yourself</string>
+    <string name="members">Members</string>
+    <string name="favorites">Favorites</string>
     <string-array name="religion_list">
         <item>None</item>
         <item>Christian</item>
