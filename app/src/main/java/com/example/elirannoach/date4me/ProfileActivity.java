@@ -1,10 +1,16 @@
 package com.example.elirannoach.date4me;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -19,8 +25,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
@@ -47,6 +56,9 @@ public class ProfileActivity extends AppCompatActivity {
     FloatingActionButton mEditProfilePhotoButton;
     @BindView(R.id.profile_activity_progress_bar)
     ProgressBar mProgressBar;
+    @BindView(R.id.profile_image)
+    CircleImageView mProfileImage;
+
 
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
@@ -55,6 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
     private  Member mMemberDetails;
 
     private final static String MEMBER_DB_KEY = "member";
+    private final static int RESULT_LOAD_IMG = 1;
 
 
     @Override
@@ -66,13 +79,18 @@ public class ProfileActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         myRef = database.getReference(MEMBER_DB_KEY+"/"+mAuth.getCurrentUser().getUid());
-        
+        mEditProfilePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectProfileImage();
 
+            }
+        });
 
         mUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fetchMemberProfileInfo();
+                updateProfile();
             }
         });
         mProfileEventListener = new ValueEventListener() {
@@ -81,6 +99,8 @@ public class ProfileActivity extends AppCompatActivity {
                 Member member = dataSnapshot.getValue(Member.class);
                 if(member!=null)
                     updateUI(member);
+                else
+                    Toast.makeText(ProfileActivity.this,getString(R.string.profile_not_exists),LENGTH_SHORT).show();
             }
 
             @Override
@@ -91,7 +111,15 @@ public class ProfileActivity extends AppCompatActivity {
         myRef.addListenerForSingleValueEvent(mProfileEventListener);
     }
 
-    private void fetchMemberProfileInfo() {
+    private void selectProfileImage() {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, RESULT_LOAD_IMG);
+    }
+
+    private void updateProfile() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        setControlButtonsEnabled(false);
         String gender = mGenderRadioGroup.getCheckedRadioButtonId() == R.id.radio_male ? "Male" : "Female";
         Member.MemberBuilder memberBuilder = new Member.MemberBuilder(mAuth.getCurrentUser().getUid().toString(),mFullName.getText().toString(),gender,
                 mDateOfBirth.getText().toString());
@@ -106,8 +134,12 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null) {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    setControlButtonsEnabled(true);
                     Toast.makeText(ProfileActivity.this,getString(R.string.failed_updating_profile), LENGTH_SHORT).show();
                 } else {
+                    mProgressBar.setVisibility(View.INVISIBLE);
+                    setControlButtonsEnabled(true);
                     Toast.makeText(ProfileActivity.this,getString(R.string.profile_saved_successfully), LENGTH_SHORT).show();
                 }
             }
@@ -136,5 +168,34 @@ public class ProfileActivity extends AppCompatActivity {
         mReligionSpinner.setSelection(index);
         mOccupation.setText(member.mOccupation);
         mDescription.setText(member.mDescription);
+    }
+
+    private void setControlButtonsEnabled(boolean state){
+        mFullName.setEnabled(state);
+        mGenderRadioGroup.setEnabled(state);
+        mDateOfBirth.setEnabled(state);
+        mCity.setEnabled(state);
+        mStateSpinner.setEnabled(state);
+        mReligionSpinner.setEnabled(state);
+        mOccupation.setEnabled(state);
+        mDescription.setEnabled(state);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK){
+            switch (requestCode){
+                case RESULT_LOAD_IMG:
+                    Uri selectedImage = data.getData();
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(ProfileActivity.this.getContentResolver(), selectedImage);
+                        mProfileImage.setImageBitmap(bitmap);
+                    } catch (IOException e) {
+                        Log.i("TAG", "Some exception " + e);
+                    }
+                    break;
+            }
+        }
     }
 }
