@@ -34,6 +34,13 @@
     <string name="about_yourself">About Yourself</string>
     <string name="members">Members</string>
     <string name="favorites">Favorites</string>
+    <string name="registration_wrong_input">Check the email adress and make sure password is atleast 8 characters</string>
+    <string name = "registration_failed">Failed to create new account. please try again</string>
+    <string name = "signin_failed_msg">User Authentication Failed</string>
+    <string name="signout">Sign Out</string>
+    <string name="my_profile">My Profile</string>
+    <string name="profile_saved_successfully">Profile was updated successfully</string>
+    <string name="failed_updating_profile">Failed to save changes to your profile</string>
     <string-array name="religion_list">
         <item>None</item>
         <item>Christian</item>
@@ -92,6 +99,9 @@
         <item>WV</item>
         <item>WI</item>
         <item>WY</item>
+    </string-array>
+    <string-array name="action_bar_list">
+        <item>Sign Out</item>
     </string-array>
 
 

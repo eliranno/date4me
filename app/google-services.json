@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "411552849658",
+    "firebase_url": "https://date4me-9251f.firebaseio.com",
+    "project_id": "date4me-9251f",
+    "storage_bucket": "date4me-9251f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:411552849658:android:b9164a5f1e51aefb",
+        "android_client_info": {
+          "package_name": "com.example.elirannoach.date4me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "411552849658-0tra11d5rljdgq91smnt5d6mrpu0iusi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.elirannoach.date4me",
+            "certificate_hash": "d3c51c114d27cc83b4f9c0f730b7748287707869"
+          }
+        },
+        {
+          "client_id": "411552849658-i7mcmadjbn7da58i9jolcp5rs5jv09bh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA37LJ1Qljxky-YPy_za0UaPvOrIZcg11s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "411552849658-i7mcmadjbn7da58i9jolcp5rs5jv09bh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

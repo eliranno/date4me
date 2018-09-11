@@ -29,13 +29,21 @@
                     app:civ_border_width="2dp"
                     app:civ_border_color="@color/black"/>
 
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/profile_activity_progress_bar"
+                    android:layout_below="@+id/profile_image"
+                    android:layout_marginTop="10dp"
+                    android:visibility="visible" />
+
             </RelativeLayout>
+
 
             <ScrollView
                 android:id="@+id/scrollview_profile_activity"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -52,10 +60,8 @@
 
                 </LinearLayout>
 
-
-
-
             </ScrollView>
+
 
         </LinearLayout>
     </FrameLayout>

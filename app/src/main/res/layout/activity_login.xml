@@ -20,7 +20,7 @@
         app:srcCompat="@drawable/app_logo" />
 
     <EditText
-        android:id="@+id/email_et"
+        android:id="@+id/login_email_et"
         android:layout_width="273dp"
         android:layout_height="49dp"
         android:layout_marginStart="74dp"
@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <EditText
-        android:id="@+id/password_ev"
+        android:id="@+id/login_password_ev"
         android:layout_width="275dp"
         android:layout_height="47dp"
         android:layout_marginStart="74dp"
@@ -41,17 +41,17 @@
         android:hint="@string/prompt_password"
         android:inputType="textPassword"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email_et" />
+        app:layout_constraintTop_toBottomOf="@+id/login_email_et" />
 
     <Button
-        android:id="@+id/signin_button"
+        android:id="@+id/login_signin_button"
         android:layout_width="275dp"
         android:layout_height="47dp"
         android:layout_marginStart="74dp"
         android:layout_marginTop="30dp"
         android:text="@string/signin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_ev" />
+        app:layout_constraintTop_toBottomOf="@+id/login_password_ev" />
 
     <TextView
         android:id="@+id/textView"
@@ -61,10 +61,10 @@
         android:layout_marginTop="24dp"
         android:text="@string/not_member"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signin_button" />
+        app:layout_constraintTop_toBottomOf="@+id/login_signin_button" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/login_signup_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -72,8 +72,9 @@
         android:text="@string/signup"
         android:textColor="@color/colorPrimary"
         android:textStyle="bold"
+        android:clickable="true"
         app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/signin_button" />
+        app:layout_constraintTop_toBottomOf="@+id/login_signin_button" />
 
     <TextView
         android:id="@+id/textView3"
