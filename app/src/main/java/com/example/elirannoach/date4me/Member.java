@@ -4,6 +4,7 @@ import com.google.firebase.database.PropertyName;
 import com.google.gson.annotations.SerializedName;
 
 public class Member {
+    // bad idea to make these fields public, but butterkife makes life easier so why not...
     @PropertyName("uid")
     public String mUid;
     @PropertyName("name")
@@ -34,6 +35,8 @@ public class Member {
         this.mOccupation = mOccupation;
         this.mDescription = mDescription;
     }
+
+    public Member(){}
 
     public static class MemberBuilder{
         private String mUid;

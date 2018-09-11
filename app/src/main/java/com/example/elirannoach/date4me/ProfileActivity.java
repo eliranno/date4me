@@ -12,17 +12,17 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.ev_full_name)
@@ -48,9 +48,11 @@ public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.profile_activity_progress_bar)
     ProgressBar mProgressBar;
 
-    FirebaseAuth mAuth;
-    FirebaseDatabase database;
-    DatabaseReference myRef;
+    private FirebaseAuth mAuth;
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+    private ValueEventListener mProfileEventListener;
+    private  Member mMemberDetails;
 
     private final static String MEMBER_DB_KEY = "member";
 
@@ -73,6 +75,20 @@ public class ProfileActivity extends AppCompatActivity {
                 fetchMemberProfileInfo();
             }
         });
+        mProfileEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Member member = dataSnapshot.getValue(Member.class);
+                if(member!=null)
+                    updateUI(member);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(ProfileActivity.this,getString(R.string.failed_loading_profile),LENGTH_SHORT).show();
+            }
+        };
+        myRef.addListenerForSingleValueEvent(mProfileEventListener);
     }
 
     private void fetchMemberProfileInfo() {
@@ -90,11 +106,35 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null) {
-                    Toast.makeText(ProfileActivity.this,getString(R.string.failed_updating_profile),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this,getString(R.string.failed_updating_profile), LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(ProfileActivity.this,getString(R.string.profile_saved_successfully),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this,getString(R.string.profile_saved_successfully), LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private void updateUI(Member member){
+        mFullName.setText(member.mName);
+        mGenderRadioGroup.check(member.mGender == "male" ? R.id.radio_male : R.id.radio_female);
+        mDateOfBirth.setText(member.mDob);
+        mCity.setText(member.mCity);
+        int index = 0;
+        for (int i=0;i<mStateSpinner.getCount();i++){
+            if (mStateSpinner.getItemAtPosition(i).equals(member.mState)){
+                index = i;
+                break;
+            }
+        }
+        mStateSpinner.setSelection(index);
+        for (int i=0;i<mReligionSpinner.getCount();i++){
+            if (mReligionSpinner.getItemAtPosition(i).equals(member.mReligion)){
+                index = i;
+                break;
+            }
+        }
+        mReligionSpinner.setSelection(index);
+        mOccupation.setText(member.mOccupation);
+        mDescription.setText(member.mDescription);
     }
 }

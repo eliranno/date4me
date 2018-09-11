@@ -41,6 +41,7 @@
     <string name="my_profile">My Profile</string>
     <string name="profile_saved_successfully">Profile was updated successfully</string>
     <string name="failed_updating_profile">Failed to save changes to your profile</string>
+    <string name= "failed_loading_profile">Failed to load your profile</string>
     <string-array name="religion_list">
         <item>None</item>
         <item>Christian</item>
