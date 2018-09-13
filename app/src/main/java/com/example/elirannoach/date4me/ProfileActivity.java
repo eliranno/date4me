@@ -20,6 +20,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.elirannoach.date4me.Service.FireBaseHelper;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,22 +68,11 @@ public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.profile_image)
     CircleImageView mProfileImage;
 
-    // Google Firebase instances
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase database;
-    private DatabaseReference myRef;
-    private ValueEventListener mProfileEventListener;
-    private FirebaseStorage mStorage;
-    private DatabaseReference.CompletionListener mDatabaseListerner;
-
     private  Member mMemberDetails;
+    private String mProfileImageUrl;
+
     // static members
-    private final static String MEMBER_DB_KEY = "member";
     private final static int RESULT_LOAD_IMG = 1;
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,10 +80,8 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
         mProgressBar.setVisibility(View.INVISIBLE);
-        database = FirebaseDatabase.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        myRef = database.getReference(MEMBER_DB_KEY+"/"+mAuth.getCurrentUser().getUid());
-        mStorage = FirebaseStorage.getInstance();
+        mProfileImageUrl = "";
+
         mEditProfilePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,7 +98,8 @@ public class ProfileActivity extends AppCompatActivity {
                 uploadProfieImage();
             }
         });
-        mProfileEventListener = new ValueEventListener() {
+
+        FireBaseHelper.requestMemberInfo(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Member member = dataSnapshot.getValue(Member.class);
@@ -124,9 +113,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(ProfileActivity.this,getString(R.string.failed_loading_profile),LENGTH_SHORT).show();
             }
-        };
-        // get user profile info from realtime database
-        myRef.addListenerForSingleValueEvent(mProfileEventListener);
+        });
     }
 
     private void selectProfileImage() {
@@ -136,7 +123,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateProfileInfo(Member member) {
-        myRef.setValue(member,new DatabaseReference.CompletionListener(){
+        FireBaseHelper.UploadProfileInfo(member,new DatabaseReference.CompletionListener(){
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null) {
@@ -153,47 +140,39 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void uploadProfieImage() {
-        // Create a storage reference from our app
-        StorageReference storageRef = mStorage.getReference();
-
-        // Create a reference to 'images/uid'
-        final StorageReference storageReference = storageRef.child("images/"+mAuth.getCurrentUser().getUid()+".jpg");
-
-        // Get the data from an ImageView as bytes
-        mProfileImage.setDrawingCacheEnabled(true);
-        mProfileImage.buildDrawingCache();
-        Bitmap bitmap = ((BitmapDrawable) mProfileImage.getDrawable()).getBitmap();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        UploadTask uploadTask = storageReference.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(ProfileActivity.this,getString(R.string.failed_updating_profile), LENGTH_SHORT).show();
-                setControlButtonsEnabled(true);
-
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener = new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                String url = taskSnapshot.getMetadata().getPath();
-                String gender = mGenderRadioGroup.getCheckedRadioButtonId() == R.id.radio_male ? "Male" : "Female";
-                Member.MemberBuilder memberBuilder = new Member.MemberBuilder(mAuth.getCurrentUser().getUid().toString(),mFullName.getText().toString(),gender,
-                        mDateOfBirth.getText().toString());
-                memberBuilder.city(mCity.getText().toString());
-                memberBuilder.state(mStateSpinner.getSelectedItem().toString());
-                memberBuilder.religion(mReligionSpinner.getSelectedItem().toString());
-                memberBuilder.occupation(mOccupation.getText().toString());
-                memberBuilder.description(mDescription.getText().toString());
-                memberBuilder.profileImageUrl(url);
-                Member member = memberBuilder.build();
-               updateProfileInfo(member);
+                mProfileImageUrl = taskSnapshot.getMetadata().getPath();
+                Member memberProfile = createMemberObject();
+                uploadProfieImage();
 
 
             }
-        });
+        };
+        OnFailureListener onFailureListener = new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ProfileActivity.this,getString(R.string.failed_updating_profile), LENGTH_SHORT).show();
+                setControlButtonsEnabled(true);
+            }
+        };
+        FireBaseHelper.UploadProfileImage(mProfileImage,onSuccessListener,onFailureListener);
+    }
+
+
+    private Member createMemberObject(){
+        String gender = mGenderRadioGroup.getCheckedRadioButtonId() == R.id.radio_male ? "Male" : "Female";
+        Member.MemberBuilder memberBuilder = new Member.MemberBuilder(FireBaseHelper.getFireBaseUserUid(),mFullName.getText().toString(),gender,
+                mDateOfBirth.getText().toString());
+        memberBuilder.city(mCity.getText().toString());
+        memberBuilder.state(mStateSpinner.getSelectedItem().toString());
+        memberBuilder.religion(mReligionSpinner.getSelectedItem().toString());
+        memberBuilder.occupation(mOccupation.getText().toString());
+        memberBuilder.description(mDescription.getText().toString());
+        memberBuilder.profileImageUrl(mProfileImageUrl);
+        return memberBuilder.build();
+
     }
 
     private void updateUI(Member member){
@@ -215,28 +194,25 @@ public class ProfileActivity extends AppCompatActivity {
                 break;
             }
         }
+
         mReligionSpinner.setSelection(index);
         mOccupation.setText(member.mOccupation);
         mDescription.setText(member.mDescription);
         String url = member.mProfileImageUrl;
-        StorageReference gsReference = mStorage.getReference().child(url);
         final long ONE_MEGABYTE = 1024 * 1024;
-        gsReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+        FireBaseHelper.getUserProfileImage(url,new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap imageBitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
                 mProfileImage.setImageBitmap(imageBitmap);
             }
-        }).addOnFailureListener(new OnFailureListener() {
+        },new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
             }
         });
     }
-
-
-
 
     private void setControlButtonsEnabled(boolean state){
         mFullName.setEnabled(state);
