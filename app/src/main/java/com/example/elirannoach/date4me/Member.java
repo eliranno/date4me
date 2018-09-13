@@ -3,6 +3,10 @@ package com.example.elirannoach.date4me;
 import com.google.firebase.database.PropertyName;
 import com.google.gson.annotations.SerializedName;
 
+import java.net.URL;
+
+import retrofit2.http.Url;
+
 public class Member {
     // bad idea to make these fields public, but butterkife makes life easier so why not...
     @PropertyName("uid")
@@ -23,8 +27,10 @@ public class Member {
     public String mOccupation;
     @PropertyName("description")
     public String mDescription;
+    @PropertyName("profile_image_url")
+    public String mProfileImageUrl;
 
-    private Member(String mUid, String mName, String nGender, String mDob, String mCity, String mState, String mReligion, String mOccupation, String mDescription) {
+    private Member(String mUid, String mName, String nGender, String mDob, String mCity, String mState, String mReligion, String mOccupation, String mDescription,String profileImageUrl) {
         this.mUid = mUid;
         this.mName = mName;
         this.mGender = nGender;
@@ -34,6 +40,7 @@ public class Member {
         this.mReligion = mReligion;
         this.mOccupation = mOccupation;
         this.mDescription = mDescription;
+        this.mProfileImageUrl = profileImageUrl;
     }
 
     public Member(){}
@@ -48,6 +55,7 @@ public class Member {
         private String mReligion;
         private String mOccupation;
         private String mDescription;
+        private String mProfileImageUrl;
 
 
         public MemberBuilder (String uid,String name,String gender,String dob){
@@ -82,8 +90,13 @@ public class Member {
             return this;
         }
 
+        public MemberBuilder profileImageUrl(String url){
+            this.mProfileImageUrl = url;
+            return this;
+        }
+
         public Member build(){
-            return new Member(this.mUid,this.mName,this.mGender,this.mDob,this.mCity,this.mState,this.mReligion,this.mOccupation,this.mDescription);
+            return new Member(this.mUid,this.mName,this.mGender,this.mDob,this.mCity,this.mState,this.mReligion,this.mOccupation,this.mDescription,this.mProfileImageUrl);
         }
 
 
