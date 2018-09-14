@@ -1,7 +1,9 @@
-package com.example.elirannoach.date4me;
+package com.example.elirannoach.date4me.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.elirannoach.date4me.R;
 
 public class ChatActivity extends AppCompatActivity {
 

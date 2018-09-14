@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:autofillHints="@string/prompt_email"
     android:backgroundTint="#ffffff"
-    tools:context=".LoginActivity">
+    tools:context=".ui.LoginActivity">
 
     <ImageView
         android:id="@+id/app_logo_iv"

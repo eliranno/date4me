@@ -1,9 +1,11 @@
-package com.example.elirannoach.date4me;
+package com.example.elirannoach.date4me.ui;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.widget.RemoteViews;
+
+import com.example.elirannoach.date4me.R;
 
 /**
  * Implementation of App Widget functionality.

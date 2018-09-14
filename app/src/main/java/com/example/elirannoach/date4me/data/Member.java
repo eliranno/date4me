@@ -1,11 +1,6 @@
-package com.example.elirannoach.date4me;
+package com.example.elirannoach.date4me.data;
 
 import com.google.firebase.database.PropertyName;
-import com.google.gson.annotations.SerializedName;
-
-import java.net.URL;
-
-import retrofit2.http.Url;
 
 public class Member {
     // bad idea to make these fields public, but butterkife makes life easier so why not...

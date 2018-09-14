@@ -1,10 +1,10 @@
-package com.example.elirannoach.date4me.Utils;
+package com.example.elirannoach.date4me.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
 
-import com.example.elirannoach.date4me.Member;
+import com.example.elirannoach.date4me.data.Member;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;

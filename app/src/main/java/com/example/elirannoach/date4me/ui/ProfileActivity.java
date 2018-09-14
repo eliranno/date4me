@@ -1,16 +1,16 @@
-package com.example.elirannoach.date4me;
+package com.example.elirannoach.date4me.ui;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +20,9 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.elirannoach.date4me.Utils.FireBaseUtils;
+import com.example.elirannoach.date4me.R;
+import com.example.elirannoach.date4me.utils.FireBaseUtils;
+import com.example.elirannoach.date4me.data.Member;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -63,7 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.profile_image)
     CircleImageView mProfileImage;
 
-    private  Member mMemberDetails;
+    private Member mMemberDetails;
     private String mProfileImageUrl;
 
     // static members

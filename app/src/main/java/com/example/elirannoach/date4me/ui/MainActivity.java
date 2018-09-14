@@ -1,4 +1,4 @@
-package com.example.elirannoach.date4me;
+package com.example.elirannoach.date4me.ui;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.elirannoach.date4me.R;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
