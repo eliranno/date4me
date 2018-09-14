@@ -1,4 +1,4 @@
-package com.example.elirannoach.date4me.Service;
+package com.example.elirannoach.date4me.Utils;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,7 +17,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
-public class FireBaseHelper {
+public class FireBaseUtils {
 
     private final static String MEMBER_DB_KEY = "member";
 

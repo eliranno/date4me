@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -13,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -20,20 +20,15 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.elirannoach.date4me.Service.FireBaseHelper;
+import com.example.elirannoach.date4me.Utils.FireBaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import butterknife.BindView;
@@ -81,6 +76,7 @@ public class ProfileActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mProgressBar.setVisibility(View.INVISIBLE);
         mProfileImageUrl = "";
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mEditProfilePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        FireBaseHelper.requestMemberInfo(new ValueEventListener() {
+        FireBaseUtils.requestMemberInfo(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Member member = dataSnapshot.getValue(Member.class);
@@ -116,6 +112,16 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                startActivity(new Intent(this,MainActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void selectProfileImage() {
         Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
         photoPickerIntent.setType("image/*");
@@ -123,7 +129,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void updateProfileInfo(Member member) {
-        FireBaseHelper.UploadProfileInfo(member,new DatabaseReference.CompletionListener(){
+        FireBaseUtils.UploadProfileInfo(member,new DatabaseReference.CompletionListener(){
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError != null) {
@@ -145,7 +151,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 mProfileImageUrl = taskSnapshot.getMetadata().getPath();
                 Member memberProfile = createMemberObject();
-                uploadProfieImage();
+                updateProfileInfo(memberProfile);
 
 
             }
@@ -157,13 +163,13 @@ public class ProfileActivity extends AppCompatActivity {
                 setControlButtonsEnabled(true);
             }
         };
-        FireBaseHelper.UploadProfileImage(mProfileImage,onSuccessListener,onFailureListener);
+        FireBaseUtils.UploadProfileImage(mProfileImage,onSuccessListener,onFailureListener);
     }
 
 
     private Member createMemberObject(){
         String gender = mGenderRadioGroup.getCheckedRadioButtonId() == R.id.radio_male ? "Male" : "Female";
-        Member.MemberBuilder memberBuilder = new Member.MemberBuilder(FireBaseHelper.getFireBaseUserUid(),mFullName.getText().toString(),gender,
+        Member.MemberBuilder memberBuilder = new Member.MemberBuilder(FireBaseUtils.getFireBaseUserUid(),mFullName.getText().toString(),gender,
                 mDateOfBirth.getText().toString());
         memberBuilder.city(mCity.getText().toString());
         memberBuilder.state(mStateSpinner.getSelectedItem().toString());
@@ -200,7 +206,7 @@ public class ProfileActivity extends AppCompatActivity {
         mDescription.setText(member.mDescription);
         String url = member.mProfileImageUrl;
         final long ONE_MEGABYTE = 1024 * 1024;
-        FireBaseHelper.getUserProfileImage(url,new OnSuccessListener<byte[]>() {
+        FireBaseUtils.getUserProfileImage(url,new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap imageBitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
@@ -235,7 +241,7 @@ public class ProfileActivity extends AppCompatActivity {
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(ProfileActivity.this.getContentResolver(), selectedImage);
                         mProfileImage.setImageBitmap(bitmap);
-                        mProfileImage.setRotation(90);
+                        //mProfileImage.setRotation(90);
                     } catch (IOException e) {
                         Log.i("TAG", "Some exception " + e);
                     }
