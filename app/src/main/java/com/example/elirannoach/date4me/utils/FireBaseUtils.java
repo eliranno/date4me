@@ -22,6 +22,7 @@ public class FireBaseUtils {
     public final static String MEMBER_DB_KEY = "member";
 
 
+
     public synchronized static void UploadProfileImage(ImageView profileImage, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener, OnFailureListener onFailureListener) {
         // Create Firebase Storage and Authentication instances
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -67,6 +68,13 @@ public class FireBaseUtils {
         StorageReference gsReference = firebaseStorage.getReference().child(imageUrl);
         final long ONE_MEGABYTE = 1024 * 1024;
         gsReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(onSuccessListener).addOnFailureListener(onFailureListener);
+
+    }
+
+    public static synchronized void removeEventListener(String referencePath,ValueEventListener valueEventListener){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference memberDatabaseReference = database.getReference(referencePath);
+        memberDatabaseReference.removeEventListener(valueEventListener);
 
     }
 }

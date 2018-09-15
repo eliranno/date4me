@@ -35,14 +35,74 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/member_card_image"
                     android:textColor="@color/black"
-                    android:textSize="10dp"
                     android:layout_marginTop="5dp"
                     android:layout_centerInParent="true"
                     android:textStyle="bold"
+                    android:id="@+id/card_member_fullname"
                     android:text="@string/your_full_name"
                     android:layout_marginBottom="10dp"/>
 
             </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/age"
+                android:id="@+id/member_card_age"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/from"
+                android:id="@+id/member_card_location"
+                android:textStyle="bold"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="3dp"
+                android:layout_below="@+id/member_card_age"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/member_card_occupation"
+                android:textStyle="bold"
+                android:text="@string/card_occupation"
+                android:layout_below="@+id/member_card_location"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="3dp"/>
+
+
+                <Button
+                    android:id="@+id/member_card_view_more_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignStart="@+id/member_card_age"
+                    android:background="@color/fui_transparent"
+                    android:text="@string/view_more"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/member_card_text_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="29dp"
+                    android:background="@color/fui_transparent"
+                    android:text="@string/text"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+
 
 
         </LinearLayout>

@@ -97,7 +97,7 @@ public class ProfileActivity extends AppCompatActivity {
                 uploadProfieImage();
             }
         });
-
+        //todo unregister this listener
         FireBaseUtils.readFromDatabaseReference(MEMBER_DB_KEY+"/"+FireBaseUtils.getFireBaseUserUid(),new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

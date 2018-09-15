@@ -29,9 +29,15 @@
             android:name=".ui.RegistrationActivity"
             android:theme="@style/RegistrationStyle">
         </activity>
+
         <activity android:name=".ui.MainActivity">
         </activity>
+
         <activity android:name=".ui.ChatActivity" />
+
+        <activity android:name=".ui.ProfileActivity">
+
+        </activity>
 
         <receiver android:name=".ui.AppWidget">
             <intent-filter>

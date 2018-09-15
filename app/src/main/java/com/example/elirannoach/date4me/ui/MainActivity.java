@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.elirannoach.date4me.R;
+import com.example.elirannoach.date4me.adapter.MemberCardRecycleViewAdapter;
 import com.example.elirannoach.date4me.data.Member;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.firebase.ui.auth.AuthUI;
@@ -23,15 +26,21 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    ValueEventListener mMembersValueEventListener;
+    RecyclerView mMemberCardRecycleView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mMemberCardRecycleView = findViewById(R.id.members_rv);
+        mMemberCardRecycleView.setLayoutManager(new LinearLayoutManager(this));
         requestAllMembersInfo();
     }
 
     private void requestAllMembersInfo() {
-        FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY, new ValueEventListener() {
+        mMembersValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Member> memberList = new ArrayList<>();
@@ -46,11 +55,12 @@ public class MainActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
     }
 
     private void processMemberList(List<Member> memberList) {
-
+        mMemberCardRecycleView.setAdapter(new MemberCardRecycleViewAdapter(memberList,this));
     }
 
     @Override
@@ -80,5 +90,11 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        FireBaseUtils.removeEventListener(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
+        super.onPause();
     }
 }

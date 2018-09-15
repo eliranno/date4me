@@ -25,7 +25,7 @@
     <string name="full_name">Enter Full Name</string>
     <string name="create_account">Create Account</string>
     <string name="register_below">Register Below</string>
-    <string name="your_full_name">Full Name</string>
+    <string name="your_full_name">Full Name: </string>
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="about_you">About You</string>
@@ -113,4 +113,10 @@
     <string name="profile">User Profile</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="age">Age: </string>
+    <string name="location">Location:</string>
+    <string name="from">From: </string>
+    <string name="card_occupation">Occupation:</string>
+    <string name="view_more">VIEW MORE</string>
+    <string name="text">MESSAGE</string>
 </resources>
