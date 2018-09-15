@@ -8,19 +8,49 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.elirannoach.date4me.R;
+import com.example.elirannoach.date4me.data.Member;
+import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mAuth = FirebaseAuth.getInstance();
+        requestAllMembersInfo();
+    }
+
+    private void requestAllMembersInfo() {
+        FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY, new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Member> memberList = new ArrayList<>();
+                for (DataSnapshot member : dataSnapshot.getChildren()){
+                    memberList.add(member.getValue(Member.class));
+                }
+                processMemberList(memberList);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void processMemberList(List<Member> memberList) {
+
     }
 
     @Override

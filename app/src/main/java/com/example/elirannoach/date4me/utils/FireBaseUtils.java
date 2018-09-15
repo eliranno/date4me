@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream;
 
 public class FireBaseUtils {
 
-    private final static String MEMBER_DB_KEY = "member";
+    public final static String MEMBER_DB_KEY = "member";
 
 
     public synchronized static void UploadProfileImage(ImageView profileImage, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener, OnFailureListener onFailureListener) {
@@ -50,11 +50,11 @@ public class FireBaseUtils {
         memberDatabaseReference.setValue(member,completionListener);
     }
 
-    public synchronized static void requestMemberInfo(ValueEventListener valueEventListener){
+    public synchronized static void readFromDatabaseReference(String referencePath, ValueEventListener valueEventListener){
         // Create Firebase Real Database instance
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        DatabaseReference memberDatabaseReference = database.getReference(MEMBER_DB_KEY+"/"+auth.getCurrentUser().getUid());
+        DatabaseReference memberDatabaseReference = database.getReference(referencePath);
         memberDatabaseReference.addListenerForSingleValueEvent(valueEventListener);
     }
 

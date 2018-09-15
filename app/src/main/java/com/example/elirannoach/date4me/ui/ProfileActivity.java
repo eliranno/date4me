@@ -38,6 +38,7 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.widget.Toast.LENGTH_SHORT;
+import static com.example.elirannoach.date4me.utils.FireBaseUtils.MEMBER_DB_KEY;
 
 public class ProfileActivity extends AppCompatActivity {
     @BindView(R.id.ev_full_name)
@@ -97,7 +98,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        FireBaseUtils.requestMemberInfo(new ValueEventListener() {
+        FireBaseUtils.readFromDatabaseReference(MEMBER_DB_KEY+"/"+FireBaseUtils.getFireBaseUserUid(),new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Member member = dataSnapshot.getValue(Member.class);
