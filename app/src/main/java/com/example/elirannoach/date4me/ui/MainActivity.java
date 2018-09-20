@@ -75,19 +75,22 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.action_signout:
                 onSignoutClicked();
+                break;
             case R.id.action_my_profile:
                 startActivity(new Intent(MainActivity.this,ProfileActivity.class));
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     private void onSignoutClicked() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                startActivity(new Intent(MainActivity.this,LoginActivity.class));
                 finish();
+                startActivity(new Intent(MainActivity.this,LoginActivity.class));
             }
         });
     }

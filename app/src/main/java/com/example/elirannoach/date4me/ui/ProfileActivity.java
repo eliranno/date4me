@@ -1,19 +1,24 @@
 package com.example.elirannoach.date4me.ui;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
@@ -68,6 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private Member mMemberDetails;
     private String mProfileImageUrl;
+    private static DatePickerDialog.OnDateSetListener mDateOfBirthSetListener;
 
     // static members
     private final static int RESULT_LOAD_IMG = 1;
@@ -88,6 +94,21 @@ public class ProfileActivity extends AppCompatActivity {
 
             }
         });
+
+        mDateOfBirth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerFragment datePickerFragment = new DatePickerFragment();
+                datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+            }
+        });
+
+        mDateOfBirthSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                mDateOfBirth.setText(month+1+"."+dayOfMonth+"."+year);
+            }
+        };
 
         mUpdateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,7 +207,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void updateUI(Member member){
         mFullName.setText(member.mName);
-        mGenderRadioGroup.check(member.mGender == "male" ? R.id.radio_male : R.id.radio_female);
+        mGenderRadioGroup.check(member.mGender.equalsIgnoreCase("male") ? R.id.radio_male : R.id.radio_female);
         mDateOfBirth.setText(member.mDob);
         mCity.setText(member.mCity);
         int index = 0;
@@ -218,7 +239,7 @@ public class ProfileActivity extends AppCompatActivity {
         },new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
+                // place holder already exists in the xml layout so dont do anything
             }
         });
     }
@@ -251,5 +272,23 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    public static class DatePickerFragment extends DialogFragment{
+
+
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), mDateOfBirthSetListener, year, month, day);
+        }
+
     }
 }

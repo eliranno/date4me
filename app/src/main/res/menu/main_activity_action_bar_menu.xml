@@ -9,12 +9,12 @@
         android:title="Settings"
         app:showAsAction="always">
         <menu>
-            <item android:id="@+id/action_signout"
-                android:title="@string/signout"
-                app:showAsAction="always">
-            </item>
             <item android:id="@+id/action_my_profile"
                 android:title="@string/my_profile"
+                app:showAsAction="always">
+            </item>
+            <item android:id="@+id/action_signout"
+                android:title="@string/signout"
                 app:showAsAction="always">
             </item>
         </menu>

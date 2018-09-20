@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.sendbird.chattutorial.MessageListActivity">
+    tools:context="com.example.elirannoach.date4me.ui.ChatActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/reyclerview_message_list"
@@ -54,7 +54,9 @@
             android:id="@+id/button_chatbox_send"
             android:text="SEND"
             android:textSize="14dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="@color/white"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
             android:clickable="true"
             android:layout_width="64dp"
             android:layout_height="48dp"
