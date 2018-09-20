@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView mSignUpButton;
     private FirebaseAuth mAuth;
     private ValueEventListener mReceiveProfileEventListener;
+    private ProgressBar mProgressBar;
 
     private static final String EMAIL_KEY = "email";
     private static final String PASSWORD_KEY = "password";
@@ -48,8 +50,10 @@ public class LoginActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.login_password_ev);
         mSignUpButton = findViewById(R.id.login_signup_tv);
         mSignInButton = findViewById(R.id.login_signin_button);
+        mProgressBar = findViewById(R.id.login_progress_bar);
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        mProgressBar.setVisibility(View.INVISIBLE);
 
         if(currentUser!=null)
             startActivity(new Intent(LoginActivity.this,MainActivity.class));
@@ -85,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(new Intent(LoginActivity.this,MainActivity.class));
                 }
                 else{
+                    mProgressBar.setVisibility(View.INVISIBLE);
                     showFailedLogingNotification();
                 }
             }
@@ -99,6 +104,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void onSignInRequest() {
         mSignInButton.setEnabled(false);
+        mProgressBar.setVisibility(View.VISIBLE);
         mAuth.signInWithEmailAndPassword(mEmailAddress.getText().toString(), mPassword.getText().toString())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -113,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else {
                             // If sign in fails, display a message to the user.
+                            mProgressBar.setVisibility(View.INVISIBLE);
                             showFailedLogingNotification();
                         }
                     }
