@@ -48,6 +48,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
+        <provider
+            android:authorities="com.example.elirannoach.date4me"
+            android:name=".Database.DateContentProvider"
+            android:exported="false">
+        </provider>
     </application>
 
 </manifest>

@@ -1,9 +1,11 @@
 package com.example.elirannoach.date4me.adapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.elirannoach.date4me.Database.DateContract;
 import com.example.elirannoach.date4me.R;
 import com.example.elirannoach.date4me.data.Member;
 import com.example.elirannoach.date4me.ui.ChatActivity;
@@ -22,6 +25,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.w3c.dom.Text;
 
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -75,6 +79,28 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
                 mContext.startActivity(new Intent(mContext, ChatActivity.class).putExtra("UUID",mMemberList.get(position).mUid));
             }
         });
+        holder.mFavoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Add to Favorite Database
+                if (holder.mFavoriteButton.getBackground().getConstantState() == mContext.getResources().getDrawable(R.drawable.ic_favorite_border_black_24dp).getConstantState())
+                {
+                    String uid = mMemberList.get(position).mUid;
+                    ContentValues values = new ContentValues();
+                    values.put(DateContract.FavoriteEntry.COLUMN_UID, uid);
+                    Uri uri = mContext.getContentResolver().insert(DateContract.FavoriteEntry.CONTENT_URI, values);
+                    holder.mFavoriteButton.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+                }
+                // Remove from Favorite Database
+                else{
+                    String uid = mMemberList.get(position).mUid;
+                    Uri uri = DateContract.FavoriteEntry.CONTENT_URI.buildUpon().appendPath(uid).build();
+                    int rowNumbers = mContext.getContentResolver().delete(uri,null,null);
+                    if (rowNumbers > 0)
+                        holder.mFavoriteButton.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
+                }
+            }
+        });
     }
 
     @Override
@@ -90,6 +116,7 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
         private TextView mLocation;
         private Button mViewMoreButton;
         private Button mMessageButton;
+        private  Button mFavoriteButton;
 
         public CardViewHolder(View itemView) {
             super(itemView);
@@ -100,6 +127,7 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
             mLocation = itemView.findViewById(R.id.member_card_location);
             mViewMoreButton = itemView.findViewById(R.id.member_card_view_more_button);
             mMessageButton = itemView.findViewById(R.id.member_card_text_button);
+            mFavoriteButton = itemView.findViewById(R.id.favorite_button);
         }
     }
 }

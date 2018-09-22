@@ -101,6 +101,15 @@
                     android:text="@string/text"
                     android:textColor="@color/colorAccent"
                     android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/favorite_button"
+                    android:layout_width="38dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@+id/member_card_age"
+                    android:layout_marginEnd="19dp"
+                    android:background="@drawable/ic_favorite_border_black_24dp" />
             </RelativeLayout>
 
 

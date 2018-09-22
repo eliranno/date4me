@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -86,6 +87,7 @@ public class ProfileActivity extends AppCompatActivity {
         mProgressBar.setVisibility(View.INVISIBLE);
         mProfileImageUrl = "";
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         mEditProfilePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
