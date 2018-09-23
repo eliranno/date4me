@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,57 +32,46 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity{
 
-    private ValueEventListener mMembersValueEventListener;
-    private RecyclerView mMemberCardRecycleView;
-    private CursorLoader mDatingCursorLoader;
-    private List<Member> mMemberList;
-    private MemberCardRecycleViewAdapter mMemberCardRecycleViewAdapter;
 
-    private static final int  DATING_CURSOR_LOADER_ID = 1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mMemberCardRecycleView = findViewById(R.id.members_rv);
-        mMemberCardRecycleView.setLayoutManager(new LinearLayoutManager(this));
-        requestAllMembersInfo();
-    }
+        setContentView(R.layout.tab_layout);
 
-    private void requestAllMembersInfo() {
-        mMembersValueEventListener = new ValueEventListener() {
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final PagerAdapter adapter = new PagerAdapter
+                (getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mMemberList = new ArrayList<>();
-                for (DataSnapshot member : dataSnapshot.getChildren()){
-                    mMemberList.add(member.getValue(Member.class));
-                }
-                processMemberList(mMemberList);
-                // get information from favorite database
-                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,MainActivity.this);
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
-        };
-        FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
-    }
 
-    private void processMemberList(List<Member> memberList) {
-        mMemberCardRecycleViewAdapter = new MemberCardRecycleViewAdapter(memberList,this);
-        mMemberCardRecycleView.setAdapter(mMemberCardRecycleViewAdapter);
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_activity_action_bar_menu, menu);
-
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.main_activity_action_bar_menu,menu);
+        return true;
     }
 
     @Override
@@ -98,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return true;
     }
 
+
     private void onSignoutClicked() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -108,33 +100,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
     }
 
-    @Override
-    protected void onPause() {
-        FireBaseUtils.removeEventListener(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
-        super.onPause();
-    }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        mDatingCursorLoader = new DatingCursorLoader(this, DateContract.FavoriteEntry.CONTENT_URI,null,null,null,null);
-        return mDatingCursorLoader;
-    }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        while(data.moveToNext()){
-            String favoriteID = data.getString(data.getColumnIndex(DateContract.FavoriteEntry.COLUMN_UID));
-            for (Member member : mMemberList){
-                if (member.mUid.equals(favoriteID)){
-                    member.setFavorite(true);
-                }
-            }
-        }
-        mMemberCardRecycleViewAdapter.notifyDataSetChanged();
-    }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 }

@@ -53,7 +53,7 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
     @Override
     public void onBindViewHolder(@NonNull final CardViewHolder holder, final int position) {
         holder.mMemberFullName.setText(mMemberList.get(position).mName);
-        holder.mLocation.append(" " +mMemberList.get(position).mCity + " " + mMemberList.get(position).mState);
+        holder.mLocation.setText(mContext.getString(R.string.location)+" " +mMemberList.get(position).mCity + " " + mMemberList.get(position).mState);
         String dob = mMemberList.get(position).mDob;
         String[] tokens = dob.split("\\.");
         holder.mAge.setText(mContext.getString(R.string.age)+" "+ MemberHelper.getAge(Integer.parseInt(tokens[2]),Integer.parseInt(tokens[0]),Integer.parseInt(tokens[1])));
@@ -97,8 +97,10 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
                     String uid = mMemberList.get(position).mUid;
                     Uri uri = DateContract.FavoriteEntry.CONTENT_URI;
                     int rowNumbers = mContext.getContentResolver().delete(uri,"uid  = ?",new String[]{uid});
-                    if (rowNumbers > 0)
+                    if (rowNumbers > 0) {
                         holder.mFavoriteButton.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
+                        mMemberList.get(position).setFavorite(false);
+                    }
                 }
             }
         });

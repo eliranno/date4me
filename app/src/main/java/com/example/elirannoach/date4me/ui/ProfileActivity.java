@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.elirannoach.date4me.R;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.example.elirannoach.date4me.data.Member;
+import com.example.elirannoach.date4me.utils.SharedPreferenceUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -154,7 +155,7 @@ public class ProfileActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(photoPickerIntent, "Select Picture"), RESULT_LOAD_IMG);
     }
 
-    private void updateProfileInfo(Member member) {
+    private void updateProfileInfo(final Member member) {
         FireBaseUtils.UploadProfileInfo(member,new DatabaseReference.CompletionListener(){
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -166,6 +167,8 @@ public class ProfileActivity extends AppCompatActivity {
                     mProgressBar.setVisibility(View.INVISIBLE);
                     setControlButtonsEnabled(true);
                     Toast.makeText(ProfileActivity.this,getString(R.string.profile_saved_successfully), LENGTH_SHORT).show();
+                    SharedPreferenceUtils.getInstance(ProfileActivity.this).setValue(SharedPreferenceUtils.GENDER,member.mGender);
+                    SharedPreferenceUtils.getInstance(ProfileActivity.this).setValue(SharedPreferenceUtils.DOB_TAG,member.mDob);
                 }
             }
         });
