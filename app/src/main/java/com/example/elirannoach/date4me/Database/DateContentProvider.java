@@ -107,11 +107,10 @@ public class DateContentProvider extends ContentProvider {
         final SQLiteDatabase db = mSQLHelper.getWritableDatabase();
         int result;
         switch (sUriMatcher.match(uri)){
-            case FAVORITE_CODE_WITH_ID:
+            case FAVORITE_CODE:
                 String _ID = uri.getLastPathSegment();
-                String[] whereArgs = new String[]{_ID};
-                result = db.delete(DateContract.FavoriteEntry.TABLE_NAME,DateContract.FavoriteEntry._ID+ "= ? ",
-                        whereArgs);
+                result = db.delete(DateContract.FavoriteEntry.TABLE_NAME,selection,
+                        selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

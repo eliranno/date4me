@@ -56,8 +56,9 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
         holder.mLocation.append(" " +mMemberList.get(position).mCity + " " + mMemberList.get(position).mState);
         String dob = mMemberList.get(position).mDob;
         String[] tokens = dob.split("\\.");
-        holder.mAge.append(" "+ MemberHelper.getAge(Integer.parseInt(tokens[2]),Integer.parseInt(tokens[0]),Integer.parseInt(tokens[1])));
-        holder.mOccupation.append(" "+mMemberList.get(position).mOccupation);
+        holder.mAge.setText(mContext.getString(R.string.age)+" "+ MemberHelper.getAge(Integer.parseInt(tokens[2]),Integer.parseInt(tokens[0]),Integer.parseInt(tokens[1])));
+        holder.mOccupation.setText(mContext.getString(R.string.occupaion)+" "+mMemberList.get(position).mOccupation);
+        holder.mFavoriteButton.setBackgroundResource(mMemberList.get(position).isFavorite()? R.drawable.ic_favorite_black_24dp : R.drawable.ic_favorite_border_black_24dp );
         String url = mMemberList.get(position).mProfileImageUrl;
         final long ONE_MEGABYTE = 1024 * 1024;
         FireBaseUtils.getUserProfileImage(url,new OnSuccessListener<byte[]>() {
@@ -94,8 +95,8 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
                 // Remove from Favorite Database
                 else{
                     String uid = mMemberList.get(position).mUid;
-                    Uri uri = DateContract.FavoriteEntry.CONTENT_URI.buildUpon().appendPath(uid).build();
-                    int rowNumbers = mContext.getContentResolver().delete(uri,null,null);
+                    Uri uri = DateContract.FavoriteEntry.CONTENT_URI;
+                    int rowNumbers = mContext.getContentResolver().delete(uri,"uid  = ?",new String[]{uid});
                     if (rowNumbers > 0)
                         holder.mFavoriteButton.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
                 }

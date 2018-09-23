@@ -25,6 +25,8 @@ public class Member {
     @PropertyName("profile_image_url")
     public String mProfileImageUrl;
 
+    private boolean isFavorite;
+
     private Member(String mUid, String mName, String nGender, String mDob, String mCity, String mState, String mReligion, String mOccupation, String mDescription,String profileImageUrl) {
         this.mUid = mUid;
         this.mName = mName;
@@ -36,6 +38,15 @@ public class Member {
         this.mOccupation = mOccupation;
         this.mDescription = mDescription;
         this.mProfileImageUrl = profileImageUrl;
+        isFavorite = false;
+    }
+
+    public void setFavorite(boolean isFavorite){
+        this.isFavorite = isFavorite;
+    }
+
+    public boolean isFavorite(){
+        return this.isFavorite;
     }
 
     public Member(){}
