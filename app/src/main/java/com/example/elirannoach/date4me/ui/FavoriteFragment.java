@@ -1,5 +1,6 @@
 package com.example.elirannoach.date4me.ui;
 
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,16 +31,18 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+public class FavoriteFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
 
     private ValueEventListener mMembersValueEventListener;
     private RecyclerView mMemberCardRecycleView;
     private DatingCursorLoader mDatingCursorLoader;
     private List<Member> mMemberList;
+    private List<Member> mFavoriteList;
     private MemberCardRecycleViewAdapter mMemberCardRecycleViewAdapter;
-    private BroadcastReceiver mBroadcastReceiver;
+    private BroadcastReceiver mDatabaseChangeBroadCastReceiver;
 
-    private static final int  DATING_CURSOR_LOADER_ID = 1;
+    private static final int  DATING_CURSOR_LOADER_ID = 2;
+
 
 
     @Override
@@ -55,21 +58,16 @@ public class MemberFragment extends Fragment implements android.support.v4.app.L
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestAllMembersInfo();
-        mBroadcastReceiver = new BroadcastReceiver() {
+        mDatabaseChangeBroadCastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                getLoaderManager().restartLoader(DATING_CURSOR_LOADER_ID,null,MemberFragment.this);
+                mFavoriteList.clear();
+                getLoaderManager().restartLoader(DATING_CURSOR_LOADER_ID,null,FavoriteFragment.this);
             }
         };
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         IntentFilter filter = new IntentFilter();
         filter.addAction(MainActivity.FAVORITE_DB_CHANGE_ACTION);
-        getActivity().registerReceiver(mBroadcastReceiver,filter);
+        getActivity().registerReceiver(mDatabaseChangeBroadCastReceiver,filter);
     }
 
     private void requestAllMembersInfo() {
@@ -77,6 +75,7 @@ public class MemberFragment extends Fragment implements android.support.v4.app.L
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mMemberList = new ArrayList<>();
+                mFavoriteList = new ArrayList<>();
                 String userGender = SharedPreferenceUtils.getInstance(getContext()).getStringValue(SharedPreferenceUtils.GENDER);
                 for (DataSnapshot member : dataSnapshot.getChildren()){
                     Member memberObj = member.getValue(Member.class);
@@ -85,9 +84,9 @@ public class MemberFragment extends Fragment implements android.support.v4.app.L
                     if (!gender.equalsIgnoreCase(userGender))
                         mMemberList.add(member.getValue(Member.class));
                 }
-                processMemberList(mMemberList);
+                processMemberList(mFavoriteList);
                 // get information from favorite database
-                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  MemberFragment.this);
+                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  FavoriteFragment.this);
             }
 
             @Override
@@ -106,13 +105,8 @@ public class MemberFragment extends Fragment implements android.support.v4.app.L
     @Override
     public void onPause() {
         FireBaseUtils.removeEventListener(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
+        getActivity().unregisterReceiver(mDatabaseChangeBroadCastReceiver);
         super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        getActivity().unregisterReceiver(mBroadcastReceiver);
     }
 
     @NonNull
@@ -124,22 +118,16 @@ public class MemberFragment extends Fragment implements android.support.v4.app.L
 
     @Override
     public void onLoadFinished(@NonNull android.support.v4.content.Loader<Cursor> loader, Cursor data) {
-        clearAllFavorites();
         while(data.moveToNext()){
             String favoriteID = data.getString(data.getColumnIndex(DateContract.FavoriteEntry.COLUMN_UID));
             for (Member member : mMemberList){
                 if (member.mUid.equals(favoriteID)){
                     member.setFavorite(true);
+                    mFavoriteList.add(member);
                 }
             }
         }
         mMemberCardRecycleViewAdapter.notifyDataSetChanged();
-    }
-
-    private void clearAllFavorites(){
-        for (Member member : mMemberList){
-            member.setFavorite(false);
-        }
     }
 
     @Override

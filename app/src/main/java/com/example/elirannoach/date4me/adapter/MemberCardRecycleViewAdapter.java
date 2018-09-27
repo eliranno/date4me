@@ -18,6 +18,8 @@ import com.example.elirannoach.date4me.Database.DateContract;
 import com.example.elirannoach.date4me.R;
 import com.example.elirannoach.date4me.data.Member;
 import com.example.elirannoach.date4me.ui.ChatActivity;
+import com.example.elirannoach.date4me.ui.FavoriteFragment;
+import com.example.elirannoach.date4me.ui.MainActivity;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.example.elirannoach.date4me.utils.MemberHelper;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -102,6 +104,9 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
                         mMemberList.get(position).setFavorite(false);
                     }
                 }
+                Intent intent = new Intent();
+                intent.setAction(MainActivity.FAVORITE_DB_CHANGE_ACTION);
+                mContext.sendBroadcast(intent);
             }
         });
     }

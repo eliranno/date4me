@@ -34,8 +34,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
 
+    public static final String FAVORITE_DB_CHANGE_ACTION = "favorite_db_change_action";
 
 
+    // TODO : BADD DESIGN. WE SHOULD HAVE ALL THE COMMON LOGIC BETWEEN THE 2 FRAGMENTS IN THE MAIN ACTIVITY
+    // INSTEAD OF DUPLICATING OUR SQL QUERIES AND FIREBASE HITS. 1st PRIORITY WHEN I GET EXTRA TIME
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
