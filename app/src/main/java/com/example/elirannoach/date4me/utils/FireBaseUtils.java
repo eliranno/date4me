@@ -8,6 +8,7 @@ import com.example.elirannoach.date4me.data.Member;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -59,6 +60,14 @@ public class FireBaseUtils {
         memberDatabaseReference.addListenerForSingleValueEvent(valueEventListener);
     }
 
+    public synchronized static void addChildEventListener(String referencePath, ChildEventListener childEventListener){
+        // Create Firebase Real Database instance
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference memberDatabaseReference = database.getReference(referencePath);
+        memberDatabaseReference.addChildEventListener(childEventListener);
+    }
+
     public static synchronized String getFireBaseUserUid(){
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
@@ -77,4 +86,5 @@ public class FireBaseUtils {
         memberDatabaseReference.removeEventListener(valueEventListener);
 
     }
+
 }

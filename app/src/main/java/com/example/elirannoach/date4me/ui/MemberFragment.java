@@ -30,16 +30,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<Cursor> {
+public class MemberFragment extends Fragment {
 
     private ValueEventListener mMembersValueEventListener;
     private RecyclerView mMemberCardRecycleView;
-    private DatingCursorLoader mDatingCursorLoader;
     private List<Member> mMemberList;
     private MemberCardRecycleViewAdapter mMemberCardRecycleViewAdapter;
-    private BroadcastReceiver mBroadcastReceiver;
 
-    private static final int  DATING_CURSOR_LOADER_ID = 1;
 
 
     @Override
@@ -48,102 +45,21 @@ public class MemberFragment extends Fragment implements android.support.v4.app.L
         View fragmentView = inflater.inflate(R.layout.activity_main, container, false);
         mMemberCardRecycleView = fragmentView.findViewById(R.id.members_rv);
         mMemberCardRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mMemberCardRecycleView.setAdapter(mMemberCardRecycleViewAdapter);
         return fragmentView;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestAllMembersInfo();
-        mBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                getLoaderManager().restartLoader(DATING_CURSOR_LOADER_ID,null,MemberFragment.this);
-            }
-        };
-
+        mMemberCardRecycleViewAdapter = new MemberCardRecycleViewAdapter(getContext());
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(MainActivity.FAVORITE_DB_CHANGE_ACTION);
-        getActivity().registerReceiver(mBroadcastReceiver,filter);
+
+    public void setMemberList(List<Member> memberList) {
+        mMemberCardRecycleViewAdapter.updateMemberList(memberList);
     }
 
-    private void requestAllMembersInfo() {
-        mMembersValueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mMemberList = new ArrayList<>();
-                String userGender = SharedPreferenceUtils.getInstance(getContext()).getStringValue(SharedPreferenceUtils.GENDER);
-                for (DataSnapshot member : dataSnapshot.getChildren()){
-                    Member memberObj = member.getValue(Member.class);
-                    String gender = memberObj.mGender;
-                    // same sex not allowed. TODO : create search perferences and filter.
-                    if (!gender.equalsIgnoreCase(userGender))
-                        mMemberList.add(member.getValue(Member.class));
-                }
-                processMemberList(mMemberList);
-                // get information from favorite database
-                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  MemberFragment.this);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        };
-        FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
-    }
-
-    private void processMemberList(List<Member> memberList) {
-        mMemberCardRecycleViewAdapter = new MemberCardRecycleViewAdapter(memberList,getContext());
-        mMemberCardRecycleView.setAdapter(mMemberCardRecycleViewAdapter);
-    }
-
-    @Override
-    public void onPause() {
-        FireBaseUtils.removeEventListener(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        getActivity().unregisterReceiver(mBroadcastReceiver);
-    }
-
-    @NonNull
-    @Override
-    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        mDatingCursorLoader = new DatingCursorLoader(getContext(), DateContract.FavoriteEntry.CONTENT_URI,null,null,null,null);
-        return mDatingCursorLoader;
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull android.support.v4.content.Loader<Cursor> loader, Cursor data) {
-        clearAllFavorites();
-        while(data.moveToNext()){
-            String favoriteID = data.getString(data.getColumnIndex(DateContract.FavoriteEntry.COLUMN_UID));
-            for (Member member : mMemberList){
-                if (member.mUid.equals(favoriteID)){
-                    member.setFavorite(true);
-                }
-            }
-        }
-        mMemberCardRecycleViewAdapter.notifyDataSetChanged();
-    }
-
-    private void clearAllFavorites(){
-        for (Member member : mMemberList){
-            member.setFavorite(false);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull android.support.v4.content.Loader<Cursor> loader) {
-
-    }
 }

@@ -18,19 +18,15 @@ import com.example.elirannoach.date4me.Database.DateContract;
 import com.example.elirannoach.date4me.R;
 import com.example.elirannoach.date4me.data.Member;
 import com.example.elirannoach.date4me.ui.ChatActivity;
-import com.example.elirannoach.date4me.ui.FavoriteFragment;
 import com.example.elirannoach.date4me.ui.MainActivity;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.example.elirannoach.date4me.utils.MemberHelper;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import org.w3c.dom.Text;
-
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCardRecycleViewAdapter.CardViewHolder> {
@@ -42,6 +38,17 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
         this.mMemberList = mMemberList;
         this.mContext = mContext;
     }
+
+    public MemberCardRecycleViewAdapter(Context mContext) {
+        this.mContext = mContext;
+        this.mMemberList = new ArrayList<>();
+    }
+
+    public void updateMemberList(List<Member> memberList){
+        mMemberList = memberList;
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
