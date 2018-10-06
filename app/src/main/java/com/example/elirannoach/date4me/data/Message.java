@@ -1,23 +1,25 @@
 package com.example.elirannoach.date4me.data;
 
 public class Message {
-    private Member mFrom;
-    private Member mTo;
+    private String mFrom;
+    private String mTo;
     private String mMessageID;
-    private String Value;
+    private String mValue;
 
-    public Message(Member mFrom, Member mTo, String mMessageID, String value) {
+    public Message(String mFrom, String mTo, String mMessageID, String mValue) {
         this.mFrom = mFrom;
         this.mTo = mTo;
         this.mMessageID = mMessageID;
-        Value = value;
+        this.mValue = mValue;
     }
 
-    public Member getmFrom() {
+    public Message(){}
+
+    public String getmFrom() {
         return mFrom;
     }
 
-    public Member getmTo() {
+    public String getmTo() {
         return mTo;
     }
 
@@ -25,7 +27,7 @@ public class Message {
         return mMessageID;
     }
 
-    public String getValue() {
-        return Value;
+    public String getmValue() {
+        return mValue;
     }
 }

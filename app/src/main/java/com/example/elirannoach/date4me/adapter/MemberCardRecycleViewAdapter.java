@@ -21,11 +21,16 @@ import com.example.elirannoach.date4me.ui.ChatActivity;
 import com.example.elirannoach.date4me.ui.MainActivity;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.example.elirannoach.date4me.utils.MemberHelper;
+import com.example.elirannoach.date4me.utils.SharedPreferenceUtils;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -33,10 +38,12 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
 
     private List<Member> mMemberList;
     private Context mContext;
+    private Member mMyProfile;
 
     public MemberCardRecycleViewAdapter(List<Member> mMemberList, Context mContext) {
         this.mMemberList = mMemberList;
         this.mContext = mContext;
+
     }
 
     public MemberCardRecycleViewAdapter(Context mContext) {
@@ -44,9 +51,9 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
         this.mMemberList = new ArrayList<>();
     }
 
-    public void updateMemberList(List<Member> memberList){
+    public void updateMemberList(List<Member> memberList,Member myProfile){
         mMemberList = memberList;
-        notifyDataSetChanged();
+        mMyProfile = myProfile;
     }
 
 
@@ -116,6 +123,25 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
                 mContext.sendBroadcast(intent);
             }
         });
+        holder.mMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Member member = mMemberList.get(position);
+                String conversationID = member.getConversationID();
+                if (conversationID==null){
+                    conversationID = FireBaseUtils.getKeyForNewChild("conversations");
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("user-conversation/" + FireBaseUtils.getFireBaseUserUid()+ "/" + member.mUid, new UserConversation(conversationID));
+                    childUpdates.put("user-conversation/" + member.mUid + "/" + FireBaseUtils.getFireBaseUserUid(),new UserConversation(conversationID));
+                    FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+                }
+                Intent intent = new Intent(mContext,ChatActivity.class);
+                intent.putExtra("conversationID",conversationID);
+                intent.putExtra("member",mMemberList.get(position));
+                intent.putExtra("myProfile",mMyProfile);
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -143,6 +169,17 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
             mViewMoreButton = itemView.findViewById(R.id.member_card_view_more_button);
             mMessageButton = itemView.findViewById(R.id.member_card_text_button);
             mFavoriteButton = itemView.findViewById(R.id.favorite_button);
+        }
+    }
+
+    public static class UserConversation{
+        public String conversationID;
+        public UserConversation(){
+
+        }
+
+        public UserConversation(String conversationID) {
+            this.conversationID = conversationID;
         }
     }
 }

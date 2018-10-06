@@ -1,8 +1,11 @@
 package com.example.elirannoach.date4me.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.PropertyName;
 
-public class Member {
+public class Member implements Parcelable {
     // bad idea to make these fields public, but butterkife makes life easier so why not...
     @PropertyName("uid")
     public String mUid;
@@ -25,6 +28,7 @@ public class Member {
     @PropertyName("profile_image_url")
     public String mProfileImageUrl;
 
+    private String mConversationID;
     private boolean isFavorite;
 
     private Member(String mUid, String mName, String nGender, String mDob, String mCity, String mState, String mReligion, String mOccupation, String mDescription,String profileImageUrl) {
@@ -39,6 +43,7 @@ public class Member {
         this.mDescription = mDescription;
         this.mProfileImageUrl = profileImageUrl;
         isFavorite = false;
+        this.mConversationID = null;
     }
 
     public void setFavorite(boolean isFavorite){
@@ -49,7 +54,63 @@ public class Member {
         return this.isFavorite;
     }
 
+    public String getConversationID(){
+        return this.mConversationID;
+    }
+
+    public void setmConversationID(String conversationID){
+        this.mConversationID = conversationID;
+    }
+
     public Member(){}
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.mUid);
+        dest.writeString(this.mName);
+        dest.writeString(this.mGender);
+        dest.writeString(this.mDob);
+        dest.writeString(this.mCity);
+        dest.writeString(this.mState);
+        dest.writeString(this.mReligion);
+        dest.writeString(this.mOccupation);
+        dest.writeString(this.mDescription);
+        dest.writeString(this.mProfileImageUrl);
+        dest.writeInt(this.isFavorite ? 1 : 0);
+        dest.writeString(this.mConversationID);
+
+    }
+
+    public Member (Parcel in){
+        this.mUid = in.readString();
+        this.mName = in.readString();
+        this.mGender = in.readString();
+        this.mDob = in.readString();
+        this.mCity = in.readString();
+        this.mState = in.readString();
+        this.mReligion = in.readString();
+        this.mOccupation = in.readString();
+        this.mDescription = in.readString();
+        this.mProfileImageUrl = in.readString();
+        this.isFavorite = in.readInt() == 1;
+        this.mConversationID = in.readString();
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Member createFromParcel(Parcel in) {
+            return new Member(in);
+        }
+
+        @Override
+        public Member[] newArray(int size) {
+            return new Member[size];
+        }
+    };
 
     public static class MemberBuilder{
         private String mUid;

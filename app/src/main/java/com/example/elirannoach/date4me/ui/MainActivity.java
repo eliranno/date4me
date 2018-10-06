@@ -19,6 +19,7 @@ import android.view.MenuItem;
 
 import com.example.elirannoach.date4me.Database.DateContract;
 import com.example.elirannoach.date4me.R;
+import com.example.elirannoach.date4me.adapter.MemberCardRecycleViewAdapter;
 import com.example.elirannoach.date4me.async.DatingCursorLoader;
 import com.example.elirannoach.date4me.data.Member;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private DatingCursorLoader mDatingCursorLoader;
     private List<Member> mMemberList;
     private List<Member> mFavoriteList;
+    private Member mMyProfile;
     private BroadcastReceiver mBroadcastReceiver;
     private MemberFragment mMemberListFragment;
     private MemberFragment mFavoriteMemberListFragment;
@@ -60,11 +62,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getLoaderManager().restartLoader(DATING_CURSOR_LOADER_ID,null,MainActivity.this);
             }
         };
+        mMemberList = new ArrayList<>();
+        mFavoriteList = new ArrayList<>();
         mMemberListFragment = new MemberFragment();
         mFavoriteMemberListFragment = new MemberFragment();
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         final PagerAdapter adapter = new PagerAdapter
-                (getSupportFragmentManager(), new ArrayList<Fragment>(){{add(mFavoriteMemberListFragment);add(mMemberListFragment);}});
+                (getSupportFragmentManager(), new ArrayList<Fragment>(){{add(mMemberListFragment);add(mFavoriteMemberListFragment);}});
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -109,8 +113,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mMembersValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mMemberList = new ArrayList<>();
-                mFavoriteList = new ArrayList<>();
                 String userGender = SharedPreferenceUtils.getInstance(MainActivity.this).getStringValue(SharedPreferenceUtils.GENDER);
                 for (DataSnapshot member : dataSnapshot.getChildren()){
                     Member memberObj = member.getValue(Member.class);
@@ -118,10 +120,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     // same sex not allowed. TODO : create search perferences and filter.
                     if (!gender.equalsIgnoreCase(userGender))
                         mMemberList.add(member.getValue(Member.class));
+                    if (memberObj.mUid.equals(FireBaseUtils.getFireBaseUserUid()))
+                        mMyProfile = memberObj;
                 }
-                processMemberList(mMemberList);
-                // now that we have the member list get information from favorite database
-                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  MainActivity.this);
+                mFavoriteMemberListFragment.setData(mFavoriteList,mMyProfile);
+                mMemberListFragment.setData(mMemberList,mMyProfile);
+                // get user conversations
+                getUserConversations();
             }
 
             @Override
@@ -132,8 +137,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
     }
 
-    private void processMemberList(List<Member> memberList) {
+    private void getUserConversations(){
+        FireBaseUtils.readFromDatabaseReference("user-conversation/"+FireBaseUtils.getFireBaseUserUid(), new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot conversation : dataSnapshot.getChildren()){
+                    String uid = conversation.getKey();
+                    MemberCardRecycleViewAdapter.UserConversation userconv = conversation.getValue(MemberCardRecycleViewAdapter.UserConversation.class);
+                    for (Member member : mMemberList)
+                        if (member.mUid.equals(uid)){
+                            member.setmConversationID(userconv.conversationID);
+                        }
+                }
+                // last step get favorites from database
+                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  MainActivity.this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -186,8 +212,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             }
         }
-        mFavoriteMemberListFragment.setMemberList(mFavoriteList);
-        mMemberListFragment.setMemberList(mMemberList);
+        mMemberListFragment.updateData();
+        mFavoriteMemberListFragment.updateData();
     }
 
     @Override
@@ -201,4 +227,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         mFavoriteList.clear();
     }
+
 }

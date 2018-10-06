@@ -56,10 +56,13 @@ public class MemberFragment extends Fragment {
     }
 
 
-    public void setMemberList(List<Member> memberList) {
-        mMemberCardRecycleViewAdapter.updateMemberList(memberList);
+    public void setData(List<Member> memberList,Member myProfile) {
+        mMemberCardRecycleViewAdapter.updateMemberList(memberList,myProfile);
     }
 
+    public void updateData(){
+        mMemberCardRecycleViewAdapter.notifyDataSetChanged();
+    }
 
 
 }

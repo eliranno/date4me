@@ -60,6 +60,14 @@ public class FireBaseUtils {
         memberDatabaseReference.addListenerForSingleValueEvent(valueEventListener);
     }
 
+    public synchronized static void readAndListenFromDatabaseReference(String referencePath, ValueEventListener valueEventListener){
+        // Create Firebase Real Database instance
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference memberDatabaseReference = database.getReference(referencePath);
+        memberDatabaseReference.addValueEventListener(valueEventListener);
+    }
+
     public synchronized static void addChildEventListener(String referencePath, ChildEventListener childEventListener){
         // Create Firebase Real Database instance
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -84,7 +92,12 @@ public class FireBaseUtils {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference memberDatabaseReference = database.getReference(referencePath);
         memberDatabaseReference.removeEventListener(valueEventListener);
+    }
 
+    public static synchronized String getKeyForNewChild(String referencePath){
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference memberDatabaseReference = database.getReference();
+        return memberDatabaseReference.child(referencePath).push().getKey();
     }
 
 }
