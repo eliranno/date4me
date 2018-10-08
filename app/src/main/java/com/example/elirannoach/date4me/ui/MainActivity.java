@@ -2,11 +2,14 @@ package com.example.elirannoach.date4me.ui;
 
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -22,6 +25,8 @@ import com.example.elirannoach.date4me.R;
 import com.example.elirannoach.date4me.adapter.MemberCardRecycleViewAdapter;
 import com.example.elirannoach.date4me.async.DatingCursorLoader;
 import com.example.elirannoach.date4me.data.Member;
+import com.example.elirannoach.date4me.receivers.AutoStart;
+import com.example.elirannoach.date4me.service.MessageService;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.example.elirannoach.date4me.utils.SharedPreferenceUtils;
 import com.firebase.ui.auth.AuthUI;
@@ -34,6 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.elirannoach.date4me.service.MessageService.NEW_CONVERSATION_ADDED;
+
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ValueEventListener mMembersValueEventListener;
@@ -42,8 +49,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private List<Member> mFavoriteList;
     private Member mMyProfile;
     private BroadcastReceiver mBroadcastReceiver;
+    private BroadcastReceiver mUserConversationBroadcastReceiver;
     private MemberFragment mMemberListFragment;
     private MemberFragment mFavoriteMemberListFragment;
+    private MessageService.ServiceBinder mMessageServiceBound;
+    private ServiceConnection mServiceConnection;
+    private boolean mIsBound = false;
 
     private static final int  DATING_CURSOR_LOADER_ID = 1;
     public static final String FAVORITE_DB_CHANGE_ACTION = "favorite_db_change_action";
@@ -55,38 +66,73 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        requestAllMembersInfo();
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 getLoaderManager().restartLoader(DATING_CURSOR_LOADER_ID,null,MainActivity.this);
             }
         };
-        mMemberList = new ArrayList<>();
-        mFavoriteList = new ArrayList<>();
-        mMemberListFragment = new MemberFragment();
-        mFavoriteMemberListFragment = new MemberFragment();
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter
-                (getSupportFragmentManager(), new ArrayList<Fragment>(){{add(mMemberListFragment);add(mFavoriteMemberListFragment);}});
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        //startService(new Intent(this, MessageService.class));
+        mServiceConnection = new ServiceConnection() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mMessageServiceBound = (MessageService.ServiceBinder)service;
+                mIsBound = true;
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
+            public void onServiceDisconnected(ComponentName name) {
 
             }
+        };
+        bindService(new Intent(this, MessageService.class), mServiceConnection,Context.BIND_AUTO_CREATE);
 
+        mUserConversationBroadcastReceiver = new BroadcastReceiver() {
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
+            public void onReceive(Context context, Intent intent) {
+                String conversationID = intent.getStringExtra("ConversationID");
+                String memberID = intent.getStringExtra("memberID");
+                for (Member member : mMemberList)
+                    if (member.mUid.equals(memberID)){
+                        member.setmConversationID(conversationID);
+                    }
             }
-        });
+        };
+        if (savedInstanceState == null) {
+            requestAllMembersInfo();
+            mMemberList = new ArrayList<>();
+            mFavoriteList = new ArrayList<>();
+            mMemberListFragment = new MemberFragment();
+            mFavoriteMemberListFragment = new MemberFragment();
+            final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+            final PagerAdapter adapter = new PagerAdapter
+                    (getSupportFragmentManager(), new ArrayList<Fragment>() {{
+                        add(mMemberListFragment);
+                        add(mFavoriteMemberListFragment);
+                    }});
+            viewPager.setAdapter(adapter);
+            viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager.setCurrentItem(tab.getPosition());
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+        }
+        else {
+            mMemberList = savedInstanceState.getParcelableArrayList("memberList");
+            mFavoriteList = savedInstanceState.getParcelableArrayList("favoriteList");
+        }
     }
 
     @Override
@@ -95,18 +141,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         IntentFilter filter = new IntentFilter();
         filter.addAction(MainActivity.FAVORITE_DB_CHANGE_ACTION);
         registerReceiver(mBroadcastReceiver,filter);
+        IntentFilter filter2 =  new IntentFilter();
+        filter2.addAction(NEW_CONVERSATION_ADDED);
+        registerReceiver(mUserConversationBroadcastReceiver,filter2);
     }
 
     @Override
     public void onPause() {
-        FireBaseUtils.removeEventListener(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
+        if (mMembersValueEventListener!=null)
+            FireBaseUtils.removeEventListener(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
         super.onPause();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        if (mIsBound) {
+            this.unbindService(mServiceConnection);
+            mIsBound = false;
+        }
         unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mUserConversationBroadcastReceiver);
     }
 
     private void requestAllMembersInfo() {
@@ -118,15 +173,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Member memberObj = member.getValue(Member.class);
                     String gender = memberObj.mGender;
                     // same sex not allowed. TODO : create search perferences and filter.
-                    if (!gender.equalsIgnoreCase(userGender))
-                        mMemberList.add(member.getValue(Member.class));
+                    if (!gender.equalsIgnoreCase(userGender)) {
+                        Member newMember = member.getValue(Member.class);
+                        if (mMessageServiceBound !=null)
+                            newMember.setmConversationID(mMessageServiceBound.getUserConversationMap().get(newMember.mUid));
+                        mMemberList.add(newMember);
+                    }
                     if (memberObj.mUid.equals(FireBaseUtils.getFireBaseUserUid()))
                         mMyProfile = memberObj;
                 }
                 mFavoriteMemberListFragment.setData(mFavoriteList,mMyProfile);
                 mMemberListFragment.setData(mMemberList,mMyProfile);
-                // get user conversations
-                getUserConversations();
+                // last step get favorites from database
+                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  MainActivity.this);
             }
 
             @Override
@@ -136,30 +195,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
         FireBaseUtils.readFromDatabaseReference(FireBaseUtils.MEMBER_DB_KEY,mMembersValueEventListener);
     }
-
-    private void getUserConversations(){
-        FireBaseUtils.readFromDatabaseReference("user-conversation/"+FireBaseUtils.getFireBaseUserUid(), new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot conversation : dataSnapshot.getChildren()){
-                    String uid = conversation.getKey();
-                    MemberCardRecycleViewAdapter.UserConversation userconv = conversation.getValue(MemberCardRecycleViewAdapter.UserConversation.class);
-                    for (Member member : mMemberList)
-                        if (member.mUid.equals(uid)){
-                            member.setmConversationID(userconv.conversationID);
-                        }
-                }
-                // last step get favorites from database
-                getLoaderManager().initLoader(DATING_CURSOR_LOADER_ID,null,  MainActivity.this);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -219,6 +254,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("memberList",(ArrayList)mMemberList);
+        outState.putParcelableArrayList("favoriteList",(ArrayList)mFavoriteList);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void clearAllFavorites(){

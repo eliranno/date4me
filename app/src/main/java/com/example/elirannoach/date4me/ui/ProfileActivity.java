@@ -121,8 +121,19 @@ public class ProfileActivity extends AppCompatActivity {
                 uploadProfieImage();
             }
         });
+        Member member = getIntent().getParcelableExtra("profile");
+        String path = "";
+        if (member!=null){
+            setControlButtonsEnabled(false);
+            mUpdateButton.hide();
+            mEditProfilePhotoButton.hide();
+            path = MEMBER_DB_KEY+"/"+member.mUid;
+        }
+        else{
+            path = MEMBER_DB_KEY+"/"+FireBaseUtils.getFireBaseUserUid();
+        }
         //todo unregister this listener
-        FireBaseUtils.readFromDatabaseReference(MEMBER_DB_KEY+"/"+FireBaseUtils.getFireBaseUserUid(),new ValueEventListener() {
+        FireBaseUtils.readFromDatabaseReference(path,new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Member member = dataSnapshot.getValue(Member.class);
@@ -258,6 +269,7 @@ public class ProfileActivity extends AppCompatActivity {
         mReligionSpinner.setEnabled(state);
         mOccupation.setEnabled(state);
         mDescription.setEnabled(state);
+        mGenderRadioGroup.setEnabled(false);
     }
 
     @Override

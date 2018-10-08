@@ -19,6 +19,7 @@ import com.example.elirannoach.date4me.R;
 import com.example.elirannoach.date4me.data.Member;
 import com.example.elirannoach.date4me.ui.ChatActivity;
 import com.example.elirannoach.date4me.ui.MainActivity;
+import com.example.elirannoach.date4me.ui.ProfileActivity;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.example.elirannoach.date4me.utils.MemberHelper;
 import com.example.elirannoach.date4me.utils.SharedPreferenceUtils;
@@ -27,6 +28,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,12 +83,24 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
             @Override
             public void onSuccess(byte[] bytes) {
                 Bitmap imageBitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 50, bs);
                 holder.mCardMemberImage.setImageBitmap(imageBitmap);
+                // size is too big need to compress
+                //mMemberList.get(position).setProfilePhoto(bs.toByteArray());
             }
         },new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // place holder is already set in xml so don't do anything
+            }
+        });
+        holder.mViewMoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, ProfileActivity.class);
+                intent.putExtra("profile",mMemberList.get(position));
+                mContext.startActivity(intent);
             }
         });
         holder.mMessageButton.setOnClickListener(new View.OnClickListener() {
@@ -131,8 +145,8 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
                 if (conversationID==null){
                     conversationID = FireBaseUtils.getKeyForNewChild("conversations");
                     Map<String, Object> childUpdates = new HashMap<>();
-                    childUpdates.put("user-conversation/" + FireBaseUtils.getFireBaseUserUid()+ "/" + member.mUid, new UserConversation(conversationID));
-                    childUpdates.put("user-conversation/" + member.mUid + "/" + FireBaseUtils.getFireBaseUserUid(),new UserConversation(conversationID));
+                    childUpdates.put("user-conversation/" + FireBaseUtils.getFireBaseUserUid()+ "/" + member.mUid, new UserConversation(conversationID,member.mUid));
+                    childUpdates.put("user-conversation/" + member.mUid + "/" + FireBaseUtils.getFireBaseUserUid(),new UserConversation(conversationID,FireBaseUtils.getFireBaseUserUid()));
                     FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
                 }
                 Intent intent = new Intent(mContext,ChatActivity.class);
@@ -174,12 +188,14 @@ public class MemberCardRecycleViewAdapter extends RecyclerView.Adapter<MemberCar
 
     public static class UserConversation{
         public String conversationID;
+        public String memberID;
         public UserConversation(){
 
         }
 
-        public UserConversation(String conversationID) {
+        public UserConversation(String conversationID,String memberID) {
             this.conversationID = conversationID;
+            this.memberID = memberID;
         }
     }
 }

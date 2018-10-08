@@ -77,7 +77,12 @@ public class FireBaseUtils {
     }
 
     public static synchronized String getFireBaseUserUid(){
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        try {
+            return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
+        catch (Exception e){
+            return null;
+        }
     }
 
     public static synchronized void getUserProfileImage(String imageUrl,OnSuccessListener onSuccessListener,OnFailureListener onFailureListener){

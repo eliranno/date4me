@@ -1,5 +1,6 @@
 package com.example.elirannoach.date4me.data;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -30,6 +31,7 @@ public class Member implements Parcelable {
 
     private String mConversationID;
     private boolean isFavorite;
+    private byte[] mProfilePhoto;
 
     private Member(String mUid, String mName, String nGender, String mDob, String mCity, String mState, String mReligion, String mOccupation, String mDescription,String profileImageUrl) {
         this.mUid = mUid;
@@ -44,6 +46,7 @@ public class Member implements Parcelable {
         this.mProfileImageUrl = profileImageUrl;
         isFavorite = false;
         this.mConversationID = null;
+        mProfilePhoto = null;
     }
 
     public void setFavorite(boolean isFavorite){
@@ -60,6 +63,14 @@ public class Member implements Parcelable {
 
     public void setmConversationID(String conversationID){
         this.mConversationID = conversationID;
+    }
+
+    public void setProfilePhoto(byte[] bitmap){
+        this.mProfilePhoto = bitmap;
+    }
+
+    public byte[] getProfilePhotoBitmap(){
+        return this.mProfilePhoto;
     }
 
     public Member(){}
@@ -83,7 +94,12 @@ public class Member implements Parcelable {
         dest.writeString(this.mProfileImageUrl);
         dest.writeInt(this.isFavorite ? 1 : 0);
         dest.writeString(this.mConversationID);
-
+        if (this.mProfilePhoto != null) {
+            dest.writeInt(this.mProfilePhoto.length);
+            dest.writeByteArray(this.mProfilePhoto);
+        }
+        else
+            dest.writeInt(0);
     }
 
     public Member (Parcel in){
@@ -99,6 +115,11 @@ public class Member implements Parcelable {
         this.mProfileImageUrl = in.readString();
         this.isFavorite = in.readInt() == 1;
         this.mConversationID = in.readString();
+        int size = in.readInt();
+        if (size > 0) {
+            this.mProfilePhoto = new byte[size];
+            in.readByteArray(this.mProfilePhoto);
+        }
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
