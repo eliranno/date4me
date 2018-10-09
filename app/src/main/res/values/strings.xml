@@ -122,4 +122,5 @@
     <string name="select_photo">select photo</string>
     <string name="update_profile">update profile</string>
     <string name="enter_message">Enter Message</string>
+    <string name="number_of_favorites">Number of Favorites :</string>
 </resources>

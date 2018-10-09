@@ -249,6 +249,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         mMemberListFragment.updateData();
         mFavoriteMemberListFragment.updateData();
+        Intent intent = new Intent(AppWidget.DATABASE_CHANGED);
+        intent.putExtra("favorite_count",mFavoriteList.size());
+        MainActivity.this.sendBroadcast(intent);
     }
 
     @Override
