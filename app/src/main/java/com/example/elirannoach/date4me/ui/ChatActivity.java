@@ -6,18 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.telecom.ConnectionService;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -30,16 +25,9 @@ import com.example.elirannoach.date4me.service.MessageService;
 import com.example.elirannoach.date4me.utils.FireBaseUtils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.elirannoach.date4me.service.MessageService.NEW_MESSAGE_ACTION;
@@ -102,12 +90,20 @@ public class ChatActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String message = mMessageEditText.getText().toString();
-                String key = FireBaseUtils.getKeyForNewChild("conversations/"+ conversationId);
-                com.example.elirannoach.date4me.data.Message newMessage = new com.example.elirannoach.date4me.data.Message(mMyProfile.mUid,mMember.mUid,key,message);
-                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.child("conversations").child(conversationId).child(key).setValue(newMessage);
-                mMessageEditText.setText("");
+                final String message = mMessageEditText.getText().toString();
+                new AsyncTask<Void, Void, Void>(){
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        String key = FireBaseUtils.getKeyForNewChild("conversations/"+ conversationId);
+                        com.example.elirannoach.date4me.data.Message newMessage = new com.example.elirannoach.date4me.data.Message(mMyProfile.mUid,mMember.mUid,key,message);
+                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.child("conversations").child(conversationId).child(key).setValue(newMessage);
+                        mMessageEditText.setText("");
+                        return null;
+                    }
+
+                }.execute();
             }
         });
 

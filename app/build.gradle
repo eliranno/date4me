@@ -2,6 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        config {
+            keyPassword 'Elirano1'
+            storeFile file('/Users/elirannoach/keystores')
+            storePassword 'Elirano1'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.elirannoach.date4me"
@@ -21,7 +28,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'

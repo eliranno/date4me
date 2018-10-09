@@ -74,7 +74,8 @@
         android:clickable="true"
         android:src="@drawable/ic_camera_alt_black_24dp"
         app:layout_anchor="@id/profile_image"
-        app:layout_anchorGravity="bottom|center"/>
+        app:layout_anchorGravity="bottom|center"
+        app:contentDescription = "@string/select_photo"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_update_profile"
@@ -84,5 +85,6 @@
         android:clickable="true"
         android:src="@drawable/ic_save_black_24dp"
         app:layout_anchor="@id/scrollview_profile_activity"
-        app:layout_anchorGravity="bottom|right"/>
+        app:layout_anchorGravity="bottom|right"
+        app:contentDescription = "@string/update_profile"/>
 </android.support.design.widget.CoordinatorLayout>

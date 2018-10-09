@@ -119,4 +119,7 @@
     <string name="card_occupation">Occupation:</string>
     <string name="view_more">VIEW MORE</string>
     <string name="text">MESSAGE</string>
+    <string name="select_photo">select photo</string>
+    <string name="update_profile">update profile</string>
+    <string name="enter_message">Enter Message</string>
 </resources>
