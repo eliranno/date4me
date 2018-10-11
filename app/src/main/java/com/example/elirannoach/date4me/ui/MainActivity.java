@@ -238,10 +238,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         clearAllFavorites();
-        while(data.moveToNext()){
+        while (data.moveToNext()) {
             String favoriteID = data.getString(data.getColumnIndex(DateContract.FavoriteEntry.COLUMN_UID));
-            for (Member member : mMemberList){
-                if (member.mUid.equals(favoriteID)){
+            for (Member member : mMemberList) {
+                if (member.mUid.equals(favoriteID)) {
                     member.setFavorite(true);
                     mFavoriteList.add(member);
                 }
@@ -249,9 +249,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         mMemberListFragment.updateData();
         mFavoriteMemberListFragment.updateData();
-        Intent intent = new Intent(AppWidget.DATABASE_CHANGED);
-        intent.putExtra("favorite_count",mFavoriteList.size());
-        MainActivity.this.sendBroadcast(intent);
+        AppWidget.updateWidget(this, mFavoriteList.size());
     }
 
     @Override

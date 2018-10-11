@@ -16,15 +16,15 @@ import com.example.elirannoach.date4me.R;
  */
 public class AppWidget extends AppWidgetProvider {
     private TextView mTextView;
-    private static int sCounter = 0;
-    public static final String DATABASE_CHANGED = "favorite_count";
+    private static int sCounter;
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                int appWidgetId,int counter) {
 
         CharSequence widgetText = context.getString(R.string.appwidget_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.app_widget);
+        sCounter = counter;
         String str = context.getString(R.string.number_of_favorites) + Integer.toString(sCounter);
         views.setTextViewText(R.id.appwidget_text, str);
 
@@ -34,21 +34,19 @@ public class AppWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // There may be multiple widgets active, so update all of them
+    }
+
+    public static void updateWidget(Context context,int counter) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, AppWidget.class));
+        //Now update all widgets
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId);
+            updateAppWidget(context, appWidgetManager, appWidgetId, counter);
         }
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(DATABASE_CHANGED)) {
-            sCounter = intent.getIntExtra("favorite_count", 0);
-            AppWidgetManager gm = AppWidgetManager.getInstance(context);
-            int[] ids = gm.getAppWidgetIds(new ComponentName(context, AppWidget.class));
-            this.onUpdate(context, gm, ids);
-        }
-    }
+
+
 
     @Override
     public void onEnabled(Context context) {
