@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.icu.util.Calendar;
 import android.net.Uri;
 import android.os.Bundle;
@@ -131,6 +132,8 @@ public class ProfileActivity extends AppCompatActivity {
         }
         else{
             path = MEMBER_DB_KEY+"/"+FireBaseUtils.getFireBaseUserUid();
+            if (savedInstanceState!=null)
+                mProfileImage.setImageBitmap((Bitmap) savedInstanceState.getParcelable("image"));
         }
         //todo unregister this listener
         FireBaseUtils.readFromDatabaseReference(path,new ValueEventListener() {
@@ -289,6 +292,14 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
             }
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        BitmapDrawable drawable = (BitmapDrawable) mProfileImage.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        outState.putParcelable("image",bitmap);
+        super.onSaveInstanceState(outState);
     }
 
     public static class DatePickerFragment extends DialogFragment{

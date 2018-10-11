@@ -5,7 +5,7 @@ android {
     signingConfigs {
         config {
             keyPassword 'Elirano1'
-            storeFile file('/Users/elirannoach/keystores')
+            storeFile file('keystores')
             storePassword 'Elirano1'
         }
     }
@@ -23,6 +23,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }

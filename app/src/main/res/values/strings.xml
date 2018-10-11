@@ -123,4 +123,5 @@
     <string name="update_profile">update profile</string>
     <string name="enter_message">Enter Message</string>
     <string name="number_of_favorites">Number of Favorites :</string>
+    <string name="registration_authentication_failed">Authentication failed.</string>
 </resources>
